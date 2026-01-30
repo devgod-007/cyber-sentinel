@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import CyberGrid from "@/components/CyberGrid";
@@ -18,6 +18,7 @@ const Index = () => {
   const [inputText, setInputText] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const handleScan = async () => {
     if (!inputText.trim()) {
@@ -45,6 +46,11 @@ const Index = () => {
 
       const data: ScanResult = await response.json();
       setResult(data);
+
+      // Auto-scroll to results after DOM updates
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
 
       if (data.is_spam) {
         toast.error("Threat Detected", {
@@ -139,9 +145,11 @@ const Index = () => {
           </div>
 
           {/* Results */}
-          <AnimatePresence mode="wait">
-            {result && <ResultsDashboard result={result} />}
-          </AnimatePresence>
+          <div ref={resultsRef}>
+            <AnimatePresence mode="wait">
+              {result && <ResultsDashboard result={result} />}
+            </AnimatePresence>
+          </div>
         </motion.main>
 
         {/* Footer */}
