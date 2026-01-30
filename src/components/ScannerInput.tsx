@@ -6,9 +6,10 @@ interface ScannerInputProps {
   value: string;
   onChange: (value: string) => void;
   isScanning: boolean;
+  isFlashing?: boolean;
 }
 
-const ScannerInput = ({ value, onChange, isScanning }: ScannerInputProps) => {
+const ScannerInput = ({ value, onChange, isScanning, isFlashing }: ScannerInputProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -45,6 +46,26 @@ const ScannerInput = ({ value, onChange, isScanning }: ScannerInputProps) => {
             animate={{ opacity: 1 }}
           />
         )}
+
+        {/* Flash effect when auto-filled */}
+        <AnimatePresence>
+          {isFlashing && (
+            <motion.div
+              className="absolute inset-0 rounded-b-lg pointer-events-none border-2 border-primary"
+              initial={{ opacity: 0, boxShadow: "0 0 0px hsla(200, 100%, 50%, 0)" }}
+              animate={{ 
+                opacity: [0, 1, 0], 
+                boxShadow: [
+                  "0 0 0px hsla(200, 100%, 50%, 0)",
+                  "0 0 30px hsla(200, 100%, 50%, 0.6)",
+                  "0 0 0px hsla(200, 100%, 50%, 0)"
+                ]
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Character count */}
@@ -56,5 +77,8 @@ const ScannerInput = ({ value, onChange, isScanning }: ScannerInputProps) => {
     </motion.div>
   );
 };
+
+// Need to import AnimatePresence
+import { AnimatePresence } from "framer-motion";
 
 export default ScannerInput;
